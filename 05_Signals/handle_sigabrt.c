@@ -3,30 +3,27 @@
 #include <unistd.h>
 #include <signal.h>
 
-void sigabrt_handler(int sig){
-	printf("Caught signal %d (SIGABRT)\n", sig);
-	printf("exiting ..\n");
+void handle_sigabrt(int sig){
+	printf("caught signal %d (SIGABRT)\n", sig);
+	printf("exiting..\n");
 	_exit(0);
 }
 
 int main(void){
 	struct sigaction sa;
-	sa.sa_handler = sigabrt_handler;
+
+	sa.sa_handler = handle_sigabrt;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 
-	int ret = sigaction(SIGABRT, &sa, NULL);
-	if(ret == -1){
-		perror("sigaction");
-		exit(1);
-	}
+	sigaction(SIGABRT, &sa, NULL);
 
-	printf("installed signal handler for SIGABRT\n");
-	printf("using abort()\n");
+	printf("installed sig handler for SIGABRT \n");
+	printf("triggeriing abort() after 3 sec\n");
 
-	abort();	//SIGABRT is generated when a process calls the abort() function.
+	sleep(3);
 
-	printf("this line will never execute\n");
+	abort();
 
 	return 0;
 }
